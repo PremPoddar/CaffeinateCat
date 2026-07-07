@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="AppIcon.png" alt="CaffeinateCat" width="128" height="128">
+  <img src="docs/assets/icon.png" alt="CaffeinateCat" width="128" height="128">
 </p>
+
 
 <h1 align="center">CaffeinateCat</h1>
 
