@@ -1,4 +1,8 @@
-# ☕️ CaffeinateCat
+<p align="center">
+  <img src="AppIcon.png" alt="CaffeinateCat" width="128" height="128">
+</p>
+
+<h1 align="center">CaffeinateCat</h1>
 
 A tiny macOS menu-bar app that keeps your Mac awake — and, when you want it to, keeps it running **even with the lid closed and unplugged**.
 
