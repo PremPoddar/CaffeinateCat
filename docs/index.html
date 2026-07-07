@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CaffeinateCat — Keep your Mac awake, lid closed</title>
+  <meta name="description" content="A tiny macOS menu-bar app that keeps your Mac awake — even with the lid closed and unplugged." />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <nav>
+    <div class="wrap">
+      <div class="brand"><img src="assets/icon.png" alt="" /> CaffeinateCat</div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#download" class="nav-cta">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap">
+      <div class="hero-icon-wrap fade-up">
+        <div class="steam"><span></span><span></span><span></span></div>
+        <img src="assets/icon.png" alt="CaffeinateCat icon" class="hero-icon" />
+      </div>
+      <h1 class="fade-up d1">Keep your Mac awake.<br />Even with the lid closed.</h1>
+      <p class="tagline fade-up d2">
+        A tiny macOS menu-bar app that stops your Mac from sleeping — and keeps your
+        builds, servers and agents running <b>even when the lid is shut and unplugged</b>.
+      </p>
+      <div class="cta-row fade-up d3">
+        <a href="https://github.com/PremPoddar/CaffeinateCat/releases/tag/v1.0.0" class="btn-primary">
+          ↓ Download for macOS
+        </a>
+        <a href="https://github.com/PremPoddar/CaffeinateCat" class="btn-ghost">
+          ★ View on GitHub
+        </a>
+      </div>
+      <p class="micro fade-up d3">Free & open source · macOS 11+ · Apple Silicon &amp; Intel</p>
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="wrap">
+      <p class="eyebrow reveal">Why CaffeinateCat</p>
+      <h2 class="section-title reveal">Small app. Big peace of mind.</h2>
+      <p class="section-sub reveal">Everything you need to keep your Mac running, nothing you don't.</p>
+
+      <div class="grid">
+        <div class="card reveal">
+          <div class="ico">☕</div>
+          <h3>Caffeinate</h3>
+          <p>Keeps your screen on and prevents idle sleep with a single click. On the moment you launch.</p>
+        </div>
+        <div class="card reveal">
+          <div class="ico">💻</div>
+          <h3>Lid-closed mode</h3>
+          <p>Shut the lid, unplug, and walk away — your Mac keeps running on battery. Perfect for travel.</p>
+        </div>
+        <div class="card reveal">
+          <div class="ico">⏱️</div>
+          <h3>Built-in timers</h3>
+          <p>Run indefinitely or auto-off after 15m, 30m, 1h, 2h, or a custom duration you choose.</p>
+        </div>
+        <div class="card reveal">
+          <div class="ico">🔒</div>
+          <h3>One-time setup</h3>
+          <p>Lid-closed mode asks for admin permission just once — no manual config, no dev account needed.</p>
+        </div>
+        <div class="card reveal">
+          <div class="ico">🪶</div>
+          <h3>Featherweight</h3>
+          <p>A single Swift file. Lives quietly in your menu bar, no Dock icon, no background bloat.</p>
+        </div>
+        <div class="card reveal">
+          <div class="ico">🛡️</div>
+          <h3>Safe by design</h3>
+          <p>Always restores normal sleep when you turn it off or quit. It can never leave your Mac stuck awake.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow reveal">Two modes</p>
+      <h2 class="section-title reveal">Pick how far you want to go</h2>
+      <div class="table-wrap reveal">
+        <table>
+          <thead>
+            <tr><th>Mode</th><th>Screen stays on</th><th>Blocks idle sleep</th><th>Lid closed</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Caffeinate</td>
+              <td class="yes">Yes</td>
+              <td class="yes">Yes</td>
+              <td class="no">Mac sleeps</td>
+            </tr>
+            <tr>
+              <td>Keep Awake When Lid Closed</td>
+              <td class="yes">Yes</td>
+              <td class="yes">Yes</td>
+              <td class="star">Stays awake ✦</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="section-sub reveal">Lid-closed mode is a superset of Caffeinate — lid open, it behaves exactly the same; lid shut, it keeps going, even on battery.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="demo">
+        <div class="reveal">
+          <h3>It lives in your menu bar</h3>
+          <p>One click on the coffee cup and you're set. Hover the arrow to choose a timer — that's the whole app.</p>
+          <ul>
+            <li>Caffeinate turns on automatically at launch</li>
+            <li>Switch modes with a single click</li>
+            <li>Set a timer, or leave it running indefinitely</li>
+            <li>Quit any time to restore normal sleep</li>
+          </ul>
+        </div>
+        <div class="menubar reveal">
+          <div class="top"><img src="assets/icon.png" alt="" /><span>CaffeinateCat</span></div>
+          <div class="mrow active">
+            <span class="l"><span class="check">✓</span> Caffeinate</span>
+            <span class="arrow">›</span>
+          </div>
+          <div class="mrow">
+            <span class="l"><span class="check"></span> Keep Awake When Lid Closed</span>
+            <span class="arrow">›</span>
+          </div>
+          <div class="msep"></div>
+          <div class="mrow quit"><span class="l">Quit</span><span>⌘Q</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <p class="eyebrow reveal">Under the hood</p>
+      <h2 class="section-title reveal">How it works</h2>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="n">01</div>
+          <h3>Idle assertions</h3>
+          <p>Caffeinate uses macOS's own <code>beginActivity</code> API to hold off idle and display sleep. No permissions required.</p>
+        </div>
+        <div class="step reveal">
+          <div class="n">02</div>
+          <h3>The lid-close trick</h3>
+          <p>For lid-closed mode it sets the <code>SleepDisabled</code> flag via <code>pmset</code> — the only reliable way to stay awake with the lid shut on battery.</p>
+        </div>
+        <div class="step reveal">
+          <div class="n">03</div>
+          <h3>Ask once, run silently</h3>
+          <p>A tiny, tightly-scoped permission rule is installed with one native admin prompt. After that, it just works — forever.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="download-band">
+    <div class="wrap">
+      <div class="download-card reveal">
+        <img src="assets/icon.png" alt="CaffeinateCat" />
+        <h2>Ready to stay awake?</h2>
+        <p>Download CaffeinateCat 1.0.0 and keep your Mac running exactly as long as you need.</p>
+        <div class="cta-row">
+          <a href="https://github.com/PremPoddar/CaffeinateCat/releases/tag/v1.0.0" class="btn-primary">↓ Download v1.0.0</a>
+          <a href="https://github.com/PremPoddar/CaffeinateCat" class="btn-ghost">★ Star on GitHub</a>
+        </div>
+        <p class="micro">Unsigned build — right-click → Open the first time to get past Gatekeeper.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="brand"><img src="assets/icon.png" alt="" style="width:26px;height:26px;border-radius:7px;" /> CaffeinateCat</div>
+      <div class="foot-note">Made with ☕ for people who close their laptops mid-task.</div>
+      <a href="https://github.com/PremPoddar/CaffeinateCat">GitHub →</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
