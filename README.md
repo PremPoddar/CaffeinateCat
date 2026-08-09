@@ -17,33 +17,43 @@ CaffeinateCat lives in your menu bar as a little coffee cup ☕️ and gives you
 
 | Mode | Screen | Idle sleep | Lid closed |
 | --- | --- | --- | --- |
-| **Caffeinate** | stays on | prevented | Mac sleeps |
-| **Keep Awake When Lid Closed** | stays on | prevented | **stays awake** (even on battery) |
+| **Keep Screen Awake** | stays on | prevented | Mac sleeps |
+| **Keep Awake on Lid Close** | stays on | prevented | **stays awake** (even on battery) |
 
-"Keep Awake When Lid Closed" is a superset of Caffeinate: when the lid is open it behaves exactly like Caffeinate, and when you close the lid it keeps everything running.
+"Keep Awake on Lid Close" is a superset of the other: when the lid is open it behaves exactly the same, and when you close the lid it keeps everything running.
 
-On launch, **Caffeinate turns on automatically (Indefinite)**, so the app just works the moment you open it.
+On launch, **Keep Screen Awake turns on automatically (Indefinite)**, so the app just works the moment you open it.
 
-### Timers
+### The panel
 
-Both modes can run indefinitely or on a timer. Hover over the options to either mode to pick a duration:
+Clicking the menu bar icon drops down a panel with a switch for each mode:
 
 ```
-☕️ CaffeinateCat
-├─ ✓ Caffeinate                  ▸   Off · Indefinite · 15m · 30m · 1h · 2h · Custom…
-│    Keep Awake When Lid Closed  ▸   Off · Indefinite · 15m · 30m · 1h · 2h · Custom…
-├──────────────────────────────
-└─ Quit
+┌──────────────────────────────────────────┐
+│  Keep Screen Awake                 ●───  │
+│  Prevents display sleep…                 │
+│  ┌──────────┬─────┬─────┬────┬────────┐  │
+│  │Indefinite│ 15m │ 30m │ 1h │ Custom │  │
+│  └──────────┴─────┴─────┴────┴────────┘  │
+│  Awake — 27:14 left                      │
+├──────────────────────────────────────────┤
+│  Keep Awake on Lid Close           ───●  │
+│  Continues running with the lid closed   │
+├──────────────────────────────────────────┤
+│  Quit                                ⌘Q  │
+└──────────────────────────────────────────┘
 ```
 
-When a timer expires, the Mac goes back to sleeping normally.
+The two switches are mutually exclusive — turning one on turns the other off. Each remembers its own duration. Picking **Custom** reveals hours and minutes fields with stepper arrows, so any duration is reachable; typing or clicking an arrow restarts the timer straight away.
+
+While a timer runs, the remaining time shows next to the menu bar icon as well as in the panel. When it expires, the Mac goes back to sleeping normally.
 
 ---
 
 ## How it works
 
-- **Caffeinate** uses `ProcessInfo.beginActivity` with idle-system and idle-display sleep assertions. No special permissions needed.
-- **Keep Awake When Lid Closed** sets the `SleepDisabled` flag in `IOPMrootDomain` via `pmset -a disablesleep 1`. This is the only reliable way to keep an Apple Silicon Mac awake with the lid shut on battery power.
+- **Keep Screen Awake** uses `ProcessInfo.beginActivity` with idle-system and idle-display sleep assertions. No special permissions needed.
+- **Keep Awake on Lid Close** sets the `SleepDisabled` flag in `IOPMrootDomain` via `pmset -a disablesleep 1`. This is the only reliable way to keep an Apple Silicon Mac awake with the lid shut on battery power.
 
 Because `pmset` needs root, the app installs a small, tightly-scoped [`sudoers`](https://www.sudo.ws/docs/man/sudoers.man/) rule the **first time you enable lid-closed mode** (or on first launch, if you opt in). This asks for your administrator password **once** via a native macOS prompt (Touch ID works too), and grants passwordless access to *exactly* these two commands and nothing else:
 
@@ -60,11 +70,20 @@ After that, the feature works silently with no more prompts. The rule is validat
 
 ## Building from source
 
-CaffeinateCat is a single Swift file with no dependencies and no Xcode project:
+CaffeinateCat is a handful of Swift files with no dependencies and no Xcode project:
 
 ```sh
-swiftc -o CaffeinateCat CaffeinateCat.swift
+swiftc -o CaffeinateCat *.swift
 ```
+
+| File | What's in it |
+| --- | --- |
+| `main.swift` | Entry point |
+| `CaffeinateCat.swift` | App delegate: modes, timers, menu bar item, `pmset` + `sudoers` |
+| `PanelController.swift` | The popover — anchoring, sizing, dismissal |
+| `PanelView.swift` | Panel layout |
+| `Controls.swift` | Custom-drawn switch, segmented control, duration fields |
+| `Theme.swift` | Colours, fonts, and metrics |
 
 ---
 

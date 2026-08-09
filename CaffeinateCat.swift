@@ -1,11 +1,12 @@
 import Cocoa
 
-let CODE_OFF = 0
-let CODE_INDEFINITE = -1
-let CODE_CUSTOM = -2
-
 // Where the passwordless pmset rule lives, and the path used to install it.
 let SUDOERS_PATH = "/etc/sudoers.d/caffeinatecat"
+
+// What the custom duration starts at, and what it is restored to whenever it is emptied to zero.
+// A zero-length custom value can't run, so it is never left in place.
+let DEFAULT_CUSTOM_HOURS = 2
+let DEFAULT_CUSTOM_MINUTES = 0
 
 // The single active "keep awake" mode. Caffeinate and lid-close are mutually exclusive
 // levels of the same thing: lid-close is a superset that also survives the lid closing.
@@ -15,130 +16,178 @@ enum Mode {
     case lidClose
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, PanelViewDelegate {
     var statusItem: NSStatusItem!
+    let panelController = PanelController()
 
     var mode: Mode = .off
-    var activeTag = CODE_INDEFINITE          // duration of the active mode
-    var timer: Timer?                        // single auto-off timer for the active mode
+    var remainingSeconds = 0                 // 0 when off or indefinite
+    var countdown = CountdownFormat(total: 0) // field widths fixed by the active run's total
+    var tickTimer: Timer?                    // drives the countdown and the auto-off
     var caffeineActivity: NSObjectProtocol?  // idle + display assertion (held by both modes)
     var lidActive = false                    // whether pmset disablesleep is currently set
 
-    var caffeineMenuItem: NSMenuItem!
-    var lidMenuItem: NSMenuItem!
-    var caffeineDurationItems: [NSMenuItem] = []
-    var lidDurationItems: [NSMenuItem] = []
+    // Each feature remembers its own duration selection, independently of which one is active.
+    var caffeinateDuration: AwakeDuration = .indefinite
+    var lidDuration: AwakeDuration = .indefinite
+    var caffeinateCustomHours = DEFAULT_CUSTOM_HOURS
+    var caffeinateCustomMinutes = DEFAULT_CUSTOM_MINUTES
+    var lidCustomHours = DEFAULT_CUSTOM_HOURS
+    var lidCustomMinutes = DEFAULT_CUSTOM_MINUTES
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Steal focus immediately so the user can just hit a key to end it
-        NSApp.activate(ignoringOtherApps: true)
+        setupStatusItem()
 
-        setupMenuBarIcon()
+        panelController.delegate = self
+        panelController.onQuit = { [weak self] in self?.quit() }
 
         // Caffeinate on (Indefinite) by default, so the app "just works" on launch.
-        setCaffeinate(tag: CODE_INDEFINITE, minutes: 0)
+        activate(.caffeinate)
 
         // First launch on a new machine: offer to set up the lid-closed permission.
         maybePromptForLidSetup()
     }
 
-    func setupMenuBarIcon() {
+    func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        if let button = statusItem.button {
+        guard let button = statusItem.button else { return }
+        button.font = Typography.menuBar
+        button.imagePosition = .imageOnly
+        button.target = self
+        button.action = #selector(statusItemClicked)
+        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 
-            // Use Apple's built-in system vector icons (perfect transparency and scaling)
-            if #available(macOS 11.0, *),
-               let image = NSImage(systemSymbolName: "cup.and.saucer.fill", accessibilityDescription: "Coffee") {
-                let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
-                button.image = image.withSymbolConfiguration(config)
-            } else {
-                // Fallback emoji just in case
-                let font = NSFont.systemFont(ofSize: 18)
-                let attributes: [NSAttributedString.Key: Any] = [.font: font]
-                button.attributedTitle = NSAttributedString(string: "☕️", attributes: attributes)
-            }
-        }
-
-        let menu = NSMenu()
-
-        // Each feature is a single row whose submenu (the ▸ arrow) holds the durations.
-        caffeineMenuItem = NSMenuItem(title: "Caffeinate", action: nil, keyEquivalent: "")
-        let (caffMenu, caffItems) = makeDurationSubmenu(action: #selector(selectCaffeineTimer(_:)))
-        caffeineMenuItem.submenu = caffMenu
-        caffeineDurationItems = caffItems
-        menu.addItem(caffeineMenuItem)
-
-        lidMenuItem = NSMenuItem(title: "Keep Awake When Lid Closed", action: nil, keyEquivalent: "")
-        let (lidMenu, lidItems) = makeDurationSubmenu(action: #selector(selectLidTimer(_:)))
-        lidMenuItem.submenu = lidMenu
-        lidDurationItems = lidItems
-        menu.addItem(lidMenuItem)
-
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q"))
-        statusItem.menu = menu
-
+        updateStatusItem()                                  // puts the icon in place to measure
+        statusItem.length = widestStatusItemWidth(button)
         refresh()
     }
 
-    // Builds a duration submenu: Off / Indefinite / presets / Custom….
-    func makeDurationSubmenu(action: Selector) -> (NSMenu, [NSMenuItem]) {
-        let submenu = NSMenu()
-        var items: [NSMenuItem] = []
-        func add(_ title: String, _ tag: Int) {
-            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
-            item.tag = tag
-            item.target = self
-            submenu.addItem(item)
-            items.append(item)
+    /// The status item is pinned to a constant width, sized for the longest label it can ever show.
+    ///
+    /// Left to size itself, the item tracks its label — and it grows leftward from a fixed trailing
+    /// edge (measured, once layout settles: screen maxX held at ~1102.5 while minX slid 1065 →
+    /// 1005 across icon-only, "On", and a HH:MM:SS countdown). Everything positioned against it,
+    /// the popover included, then slides sideways every time the text changes, which moves controls
+    /// out from under the pointer mid-click. Reserving the space up front means the item's geometry
+    /// never changes at all, so nothing anchored to it can move — regardless of how the popover
+    /// resolves its anchor.
+    ///
+    /// The button centres its icon and label inside that fixed width; `alignment = .left` does not
+    /// override it (measured by rendering the button and scanning for the icon's first opaque
+    /// column: 32pt in with no label, 4pt in with "12:00:00"). So the icon still shifts as the text
+    /// grows, by about as much as it did when the whole item resized. Pinning it would mean drawing
+    /// the icon and text into one fixed-size template image instead of using image + title.
+    private func widestStatusItemWidth(_ button: NSStatusBarButton) -> CGFloat {
+        let title = button.title
+        let position = button.imagePosition
+        button.imagePosition = .imageLeading
+        button.title = " 00:00:00"                          // widest label: HH:MM:SS
+        let width = ceil(button.fittingSize.width)
+        button.title = title
+        button.imagePosition = position
+        return width
+    }
+
+    @objc func statusItemClicked() {
+        guard let button = statusItem.button else { return }
+        panelController.toggle(from: button)
+    }
+
+    // MARK: - Duration bookkeeping
+
+    func duration(for feature: Feature) -> AwakeDuration {
+        feature == .caffeinate ? caffeinateDuration : lidDuration
+    }
+
+    func setDuration(_ duration: AwakeDuration, for feature: Feature) {
+        if feature == .caffeinate { caffeinateDuration = duration } else { lidDuration = duration }
+    }
+
+    func setCustom(hours: Int, minutes: Int, for feature: Feature) {
+        let hours = max(0, min(23, hours))
+        let minutes = max(0, min(59, minutes))
+        if feature == .caffeinate {
+            caffeinateCustomHours = hours
+            caffeinateCustomMinutes = minutes
+        } else {
+            lidCustomHours = hours
+            lidCustomMinutes = minutes
         }
-        add("Off", CODE_OFF)
-        submenu.addItem(.separator())
-        add("Indefinite", CODE_INDEFINITE)
-        add("15 minutes", 15)
-        add("30 minutes", 30)
-        add("1 hour", 60)
-        add("2 hours", 120)
-        submenu.addItem(.separator())
-        add("Custom…", CODE_CUSTOM)
-        return (submenu, items)
+    }
+
+    func resetCustomToDefault(_ feature: Feature) {
+        setCustom(hours: DEFAULT_CUSTOM_HOURS, minutes: DEFAULT_CUSTOM_MINUTES, for: feature)
+    }
+
+    /// Total seconds the feature's current selection asks for. 0 means indefinite.
+    func seconds(for feature: Feature) -> Int {
+        switch duration(for: feature) {
+        case .indefinite:
+            return 0
+        case .minutes(let minutes):
+            return minutes * 60
+        case .custom:
+            return feature == .caffeinate
+                ? caffeinateCustomHours * 3600 + caffeinateCustomMinutes * 60
+                : lidCustomHours * 3600 + lidCustomMinutes * 60
+        }
+    }
+
+    func isActive(_ feature: Feature) -> Bool {
+        feature == .caffeinate ? mode == .caffeinate : mode == .lidClose
     }
 
     // MARK: - Mode transitions
 
-    // Caffeinate: idle + display stay awake, but the Mac sleeps when the lid closes.
-    func setCaffeinate(tag: Int, minutes: Int) {
-        if lidActive { setLidCloseSleepDisabled(false); lidActive = false }
-        if caffeineActivity == nil { beginCaffeineAssertion() }
-        mode = .caffeinate
-        activeTag = tag
-        armTimer(tag: tag, minutes: minutes)
-        refresh()
-    }
+    /// Switches to `feature` at its currently selected duration, tearing down the other mode.
+    /// Also used to restart an already-active feature when its duration changes.
+    func activate(_ feature: Feature) {
+        let total = seconds(for: feature)
 
-    // Lid-close: everything caffeinate does, PLUS stays awake with the lid shut (pmset).
-    func setLidClose(tag: Int, minutes: Int) {
-        if !lidActive {
-            if !enableLidFlag() {
-                showLidUnavailableAlert()
-                refresh() // leaves the previous mode untouched
-                return
-            }
-            lidActive = true
+        // A custom duration of 0h 0m has nothing to count down. Switch off first, so the Mac is
+        // free to sleep straight away, and only then restore a usable value — leaving 0 in place is
+        // what let the feature get stuck: every later attempt to run it, whether from the switch or
+        // from re-picking Custom, recomputed 0 and turned itself off again.
+        if duration(for: feature) != .indefinite && total <= 0 {
+            setOff()
+            resetCustomToDefault(feature)
+            refresh()
+            return
         }
-        if caffeineActivity == nil { beginCaffeineAssertion() } // act as caffeinate too
-        mode = .lidClose
-        activeTag = tag
-        armTimer(tag: tag, minutes: minutes)
+
+        switch feature {
+        case .caffeinate:
+            // Caffeinate: idle + display stay awake, but the Mac sleeps when the lid closes.
+            if lidActive {
+                setLidCloseSleepDisabled(false)
+                lidActive = false
+            }
+        case .lid:
+            // Lid-close: everything caffeinate does, PLUS stays awake with the lid shut (pmset).
+            if !lidActive {
+                if !enableLidFlag() {
+                    refresh() // leaves the previous mode untouched
+                    showLidUnavailableAlert()
+                    return
+                }
+                lidActive = true
+            }
+        }
+
+        if caffeineActivity == nil { beginCaffeineAssertion() }
+        mode = (feature == .caffeinate) ? .caffeinate : .lidClose
+        remainingSeconds = total
+        countdown = CountdownFormat(total: total)
+        startTicking()
         refresh()
     }
 
     func setOff() {
-        timer?.invalidate(); timer = nil
+        tickTimer?.invalidate(); tickTimer = nil
         if lidActive { setLidCloseSleepDisabled(false); lidActive = false }
         endCaffeineAssertion()
         mode = .off
-        activeTag = CODE_INDEFINITE
+        remainingSeconds = 0
         refresh()
     }
 
@@ -156,53 +205,127 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // Arms (or clears) the auto-off timer for the current mode. Indefinite = no timer.
-    func armTimer(tag: Int, minutes: Int) {
-        timer?.invalidate(); timer = nil
-        guard tag != CODE_INDEFINITE else { return }
-        timer = Timer.scheduledTimer(withTimeInterval: Double(minutes) * 60, repeats: false) { [weak self] _ in
-            self?.setOff()
+    /// One 1s timer drives both the visible countdown and the auto-off. Indefinite = no timer.
+    /// Scheduled in `.common` so it keeps ticking while the panel is tracking a mouse press.
+    func startTicking() {
+        tickTimer?.invalidate(); tickTimer = nil
+        guard remainingSeconds > 0 else { return }
+
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            self.remainingSeconds -= 1
+            if self.remainingSeconds <= 0 {
+                self.setOff()
+            } else {
+                self.refresh()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        tickTimer = timer
+    }
+
+    // MARK: - PanelViewDelegate
+
+    func panelDidToggle(_ feature: Feature, on: Bool) {
+        guard on else {
+            setOff()
+            return
+        }
+        // Turning the switch on has to actually start something. If the custom value is still zero
+        // — typed while the feature was already off, so nothing reset it — restore the default
+        // first, otherwise `activate` would switch straight back off.
+        if duration(for: feature) == .custom && seconds(for: feature) <= 0 {
+            resetCustomToDefault(feature)
+        }
+        activate(feature)
+    }
+
+    func panelDidSelectDuration(_ feature: Feature, _ duration: AwakeDuration) {
+        setDuration(duration, for: feature)
+        if isActive(feature) { activate(feature) } else { refresh() }
+    }
+
+    func panelDidEditCustom(_ feature: Feature, hours: Int, minutes: Int) {
+        setCustom(hours: hours, minutes: minutes, for: feature)
+        if isActive(feature) && duration(for: feature) == .custom {
+            activate(feature)
+        } else {
+            refresh()
         }
     }
 
-    // MARK: - Menu actions
-
-    @objc func selectCaffeineTimer(_ sender: NSMenuItem) {
-        switch sender.tag {
-        case CODE_OFF:
-            if mode == .caffeinate { setOff() } else { refresh() } // already off
-        case CODE_CUSTOM:
-            guard let minutes = promptForMinutes() else { return }
-            setCaffeinate(tag: CODE_CUSTOM, minutes: minutes)
-        default:
-            setCaffeinate(tag: sender.tag, minutes: max(sender.tag, 0))
-        }
+    func panelDidRequestQuit() {
+        quit()
     }
 
-    @objc func selectLidTimer(_ sender: NSMenuItem) {
-        switch sender.tag {
-        case CODE_OFF:
-            if mode == .lidClose { setOff() } else { refresh() } // already off
-        case CODE_CUSTOM:
-            guard let minutes = promptForMinutes() else { return }
-            setLidClose(tag: CODE_CUSTOM, minutes: minutes)
-        default:
-            setLidClose(tag: sender.tag, minutes: max(sender.tag, 0))
-        }
+    // MARK: - Rendering
+
+    func currentState() -> PanelState {
+        PanelState(
+            caffeinateOn: mode == .caffeinate,
+            lidOn: mode == .lidClose,
+            caffeinateDuration: caffeinateDuration,
+            lidDuration: lidDuration,
+            caffeinateCustomHours: caffeinateCustomHours,
+            caffeinateCustomMinutes: caffeinateCustomMinutes,
+            lidCustomHours: lidCustomHours,
+            lidCustomMinutes: lidCustomMinutes,
+            caffeinateCountdown: mode == .caffeinate ? countdown.string(remainingSeconds) : "",
+            lidCountdown: mode == .lidClose ? countdown.string(remainingSeconds) : ""
+        )
     }
 
-    // Updates checkmarks: the active feature's row, and the selected item in each submenu.
     func refresh() {
-        caffeineMenuItem.state = (mode == .caffeinate) ? .on : .off
-        lidMenuItem.state = (mode == .lidClose) ? .on : .off
-
-        let caffeineSelection = (mode == .caffeinate) ? activeTag : CODE_OFF
-        for item in caffeineDurationItems {
-            item.state = (item.tag == caffeineSelection) ? .on : .off
+        updateStatusItem()
+        // Order matters: the anchor is derived from the button's width, so it has to be recomputed
+        // after the label that determines that width has been set.
+        if let button = statusItem.button {
+            panelController.updateAnchor(from: button)
         }
-        let lidSelection = (mode == .lidClose) ? activeTag : CODE_OFF
-        for item in lidDurationItems {
-            item.state = (item.tag == lidSelection) ? .on : .off
+        panelController.apply(currentState())
+    }
+
+    /// Icon reflects which mode is active; the label shows "On" or the remaining time.
+    func updateStatusItem() {
+        guard let button = statusItem.button else { return }
+
+        let symbolName: String
+        switch mode {
+        case .off:       symbolName = "cup.and.saucer"
+        case .caffeinate: symbolName = "cup.and.saucer.fill"
+        case .lidClose:  symbolName = "laptopcomputer"
+        }
+
+        if #available(macOS 11.0, *),
+           let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: "CaffeinateCat") {
+            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
+            button.image = image.withSymbolConfiguration(config)
+        } else {
+            button.image = nil
+            button.title = mode == .off ? "☕️" : "☕️ " + statusLabel()
+            button.imagePosition = .noImage
+            return
+        }
+
+        let label = statusLabel()
+        if label.isEmpty {
+            button.title = ""
+            button.imagePosition = .imageOnly
+        } else {
+            // Leading space stands in for the design's 5pt gap between icon and label.
+            button.title = " " + label
+            button.imagePosition = .imageLeading
+        }
+    }
+
+    private func statusLabel() -> String {
+        switch mode {
+        case .off:
+            return ""
+        case .caffeinate:
+            return caffeinateDuration == .indefinite ? "On" : countdown.string(remainingSeconds)
+        case .lidClose:
+            return lidDuration == .indefinite ? "On" : countdown.string(remainingSeconds)
         }
     }
 
@@ -286,7 +409,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if lidPrivilegeAvailable() { return }
 
         let alert = NSAlert()
-        alert.messageText = "Enable “Keep Awake When Lid Closed”?"
+        alert.messageText = "Enable “Keep Awake on Lid Close”?"
         alert.informativeText = """
         CaffeinateCat can keep your Mac running with the lid closed — even on battery, \
         so a process (server, build, coding agent…) keeps going while you travel.
@@ -314,29 +437,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         """
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
+        NSApp.activate(ignoringOtherApps: true)
         alert.runModal()
     }
 
-    // MARK: - Shared helpers
-
-    // Prompts for a whole number of minutes. Returns nil if cancelled or invalid.
-    func promptForMinutes() -> Int? {
-        let alert = NSAlert()
-        alert.messageText = "Custom timer"
-        alert.informativeText = "Keep awake for how many minutes?"
-        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        field.stringValue = "60"
-        alert.accessoryView = field
-        alert.addButton(withTitle: "Start")
-        alert.addButton(withTitle: "Cancel")
-        NSApp.activate(ignoringOtherApps: true)
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn,
-           let minutes = Int(field.stringValue.trimmingCharacters(in: .whitespaces)), minutes > 0 {
-            return minutes
-        }
-        return nil
-    }
+    // MARK: - Teardown
 
     @objc func quit() {
         cleanup()
@@ -351,14 +456,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Ends the idle assertion and, crucially, restores normal lid-close sleep so we never
     // leave the Mac permanently unable to sleep.
     func cleanup() {
-        timer?.invalidate(); timer = nil
+        tickTimer?.invalidate(); tickTimer = nil
         if lidActive { setLidCloseSleepDisabled(false); lidActive = false }
         endCaffeineAssertion()
     }
 }
-
-let app = NSApplication.shared
-app.setActivationPolicy(.accessory) // Hides it from the Dock
-let delegate = AppDelegate()
-app.delegate = delegate
-app.run()
