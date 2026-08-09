@@ -178,26 +178,38 @@ td:first-child { font-weight: 600; }
 .demo li { display: flex; gap: 12px; align-items: flex-start; color: var(--text); font-size: 0.98rem; }
 .demo li::before { content: "☕"; }
 
-.menubar {
+/* Mock of the app's drop-down panel. Stylised in the site's palette rather than the app's
+   blue accent, so it sits with the rest of the page. */
+.panel {
   background: rgba(30, 23, 17, 0.72);
   border: 1px solid var(--card-border);
-  border-radius: 16px; padding: 8px;
+  border-radius: 16px; overflow: hidden;
   box-shadow: 0 30px 60px -20px rgba(0,0,0,0.7);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   max-width: 340px; margin: 0 auto; width: 100%;
   font-size: 0.92rem;
 }
-.menubar .top { display: flex; align-items: center; gap: 8px; padding: 8px 12px 12px; border-bottom: 1px solid var(--card-border); margin-bottom: 6px; }
-.menubar .top img { width: 18px; height: 18px; border-radius: 5px; }
-.menubar .top span { color: var(--muted); font-size: 0.82rem; }
-.mrow { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 9px; transition: background .18s; }
-.mrow:hover { background: rgba(255,255,255,0.06); }
-.mrow.active { background: linear-gradient(135deg, rgba(232,161,90,0.2), rgba(201,116,58,0.12)); }
-.mrow .l { display: flex; align-items: center; gap: 9px; }
-.mrow .check { color: var(--accent); width: 14px; }
-.mrow .arrow { color: var(--muted); }
-.msep { height: 1px; background: var(--card-border); margin: 6px 8px; }
-.mrow.quit { color: var(--muted); }
+.pbar { display: flex; align-items: center; justify-content: flex-end; gap: 7px; padding: 7px 14px; background: rgba(0,0,0,0.32); border-bottom: 1px solid var(--card-border); }
+.pbar img { width: 15px; height: 15px; border-radius: 4px; }
+.pbar span { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+
+.prow { padding: 12px 14px; }
+.phead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ptitle { font-weight: 600; font-size: 0.92rem; }
+.psub { color: var(--muted); font-size: 0.78rem; line-height: 1.35; margin-top: 2px; }
+
+.switch { position: relative; flex-shrink: 0; width: 38px; height: 22px; border-radius: 11px; background: rgba(255,255,255,0.14); transition: background .18s; }
+.switch span { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.45); transition: left .18s; }
+.switch.on { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.switch.on span { left: 18px; }
+
+.seg { display: flex; gap: 2px; margin-top: 12px; padding: 2px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+.seg span { flex: 1; text-align: center; white-space: nowrap; padding: 5px 2px; border-radius: 6px; font-size: 0.72rem; color: var(--muted); }
+.seg span.sel { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #1a1208; font-weight: 600; }
+
+.pcount { margin-top: 10px; font-size: 0.76rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.psep { height: 1px; background: var(--card-border); }
+.prow.quit { display: flex; align-items: center; justify-content: space-between; color: var(--muted); padding: 11px 14px; }
 
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 52px; }
 .step { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 28px; }
