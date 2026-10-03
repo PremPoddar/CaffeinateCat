@@ -24,9 +24,13 @@ struct Palette {
     let switchOffTrack: NSColor
     let fieldBackground: NSColor
     let fieldBorder: NSColor
+    let hover: NSColor
+    let statusOn: NSColor
+    let statusOff: NSColor
+    let destructive: NSColor
 
     static let light = Palette(
-        accent: .srgb(0x127EEE),
+        accent: .srgb(0xE8620F), // the logo mug's orange, deepened a touch so white text on it stays legible
         text: .srgb(0x171614),
         subtext: .srgb(0x5F5D5A),
         panelBackground: .srgb(0xF9F8F7, alpha: 0.92),
@@ -35,11 +39,15 @@ struct Palette {
         segmentBackground: .srgb(0xE2E1E0),
         switchOffTrack: .srgb(0xCECECC),
         fieldBackground: NSColor.white,
-        fieldBorder: NSColor.black.withAlphaComponent(0.15)
+        fieldBorder: NSColor.black.withAlphaComponent(0.15),
+        hover: NSColor.black.withAlphaComponent(0.05),
+        statusOn: .srgb(0x28A745),
+        statusOff: .srgb(0xA3A19E),
+        destructive: .srgb(0xD70015)
     )
 
     static let dark = Palette(
-        accent: .srgb(0x127EEE),
+        accent: .srgb(0xFF7A2E), // the logo mug's orange, lifted for a dark background
         text: .srgb(0xF2F2F0),
         subtext: .srgb(0xA6A4A1),
         panelBackground: .srgb(0x272624, alpha: 0.92),
@@ -48,7 +56,11 @@ struct Palette {
         segmentBackground: .srgb(0x171614),
         switchOffTrack: .srgb(0x484845),
         fieldBackground: NSColor.white.withAlphaComponent(0.06),
-        fieldBorder: NSColor.white.withAlphaComponent(0.15)
+        fieldBorder: NSColor.white.withAlphaComponent(0.15),
+        hover: NSColor.white.withAlphaComponent(0.07),
+        statusOn: .srgb(0x30D158),
+        statusOff: .srgb(0x6E6C69),
+        destructive: .srgb(0xFF6961)
     )
 
     static var current: Palette {
@@ -66,6 +78,10 @@ enum Typography {
     static let quit = NSFont.systemFont(ofSize: 13, weight: .regular)
     static let quitShortcut = NSFont.systemFont(ofSize: 11, weight: .regular)
     static let menuBar = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium)
+    static let appTitle = NSFont.systemFont(ofSize: 13, weight: .bold)
+    static let appStatus = NSFont.systemFont(ofSize: 11, weight: .medium)
+    static let option = NSFont.systemFont(ofSize: 12.5, weight: .regular)
+    static let endsAt = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
 }
 
 enum Metrics {
@@ -106,11 +122,22 @@ enum Metrics {
     static let customPairGap: CGFloat = 12  // "h" group -> "m" group
 
     static let countdownHeight: CGFloat = 14
+    static let progressGap: CGFloat = 5
+    static let progressHeight: CGFloat = 3
+
+    static let appHeaderHeight: CGFloat = 30
+    static let appIconSize: CGFloat = 16
+    static let statusDotSize: CGFloat = 7
+
+    static let optionRowHeight: CGFloat = 24
+    static let checkboxSize: CGFloat = 14
+    static let checkboxRadius: CGFloat = 4
+    static let checkboxLabelGap: CGFloat = 8
 
     static let dividerHeight: CGFloat = 1
     static let dividerMargin: CGFloat = 2
 
-    static let quitRowHeight: CGFloat = 26
+    static let menuRowHeight: CGFloat = 26
 
     /// Header block: title, 2pt gap, subtitle.
     static var headerHeight: CGFloat { titleHeight + subtitleGap + subtitleHeight }
