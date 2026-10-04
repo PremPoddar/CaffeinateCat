@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/icon.png" alt="CaffeinateCat" width="128" height="128">
+  <img src="assets/icon.png" alt="CaffeinateCat" width="128" height="128">
 </p>
 
 
@@ -50,12 +50,15 @@ Clicking the menu bar icon drops down a panel; **right-clicking** it turns keep-
 │   ☐ Open at login                        │
 │   Remove Lid-Close Permission…           │
 ├──────────────────────────────────────────┤
+│  Check for Updates…                      │
 │  About CaffeinateCat                     │
 │  Quit                                ⌘Q  │
 └──────────────────────────────────────────┘
 ```
 
-The two switches are mutually exclusive — turning one on turns the other off. Each remembers its own duration, across relaunches too. Picking **Custom** reveals hours and minutes fields with stepper arrows, so any duration is reachable; typing or clicking an arrow restarts the timer straight away.
+Rows adapt to the state they describe: before the lid-close permission is installed, that switch reads *Runs lid-closed · asks for admin once*, and while the admin prompt is up, *Waiting for administrator approval…*. **Check for Updates…** names the new version instead once one is waiting, and is hidden entirely in a build without Sparkle. **Remove Lid-Close Permission…** shows only while the rule is installed.
+
+The two switches are mutually exclusive — turning one on turns the other off. Each remembers its own duration, across relaunches too. Picking **Custom** reveals hours and minutes fields with stepper arrows (up to 23 h 59 m, starting at 2 h), so any duration is reachable; typing or clicking an arrow restarts the timer straight away.
 
 While a timer runs, the remaining time shows next to the menu bar icon as well as in the panel, with the clock time it ends at. Timers are measured on a clock that keeps running while the Mac sleeps, so a run that spans a sleep ends when it should. When it expires, the Mac goes back to sleeping normally.
 
@@ -63,7 +66,7 @@ While a timer runs, the remaining time shows next to the menu bar icon as well a
 
 | Option | What it does |
 | --- | --- |
-| **Allow display to sleep** | Keeps the system awake but lets the screen turn off on its normal schedule. |
+| **Allow display to sleep** | Keeps the system awake but lets the screen turn off on its normal schedule. The first switch then reads **Keep Mac Awake**. |
 | **Turn off at 20% and 10% battery** | Switches keep-awake off as the battery falls through 20% and again through 10%, so a Mac in a bag can't run itself flat. On by default. |
 | **Keep awake when app opens** | Starts *Keep Screen Awake* at launch (the old always-on behaviour). On by default. |
 | **Open at login** | Installs a small LaunchAgent in `~/Library/LaunchAgents`. |
@@ -132,15 +135,8 @@ With a real `IDENTITY`, the script also writes `build/CaffeinateCat.xcarchive` a
 | `Controls.swift` | Custom-drawn switch, segmented control, duration fields, menu and option rows |
 | `Theme.swift` | Colours, fonts, and metrics |
 | `build.sh` | Builds, signs and optionally notarizes the `.app` without Xcode; embeds Sparkle |
+| `assets/icon.png` | The app icon, which `build.sh` turns into an `.icns` |
 | `tools/` | `fetch-sparkle.sh` (downloads the pinned Sparkle), `sparkle.conf` (its version, checksum and the update feed URL), `sparkle_public_key.txt` (the public key updates are verified with) |
-
---- | --- |
-| `main.swift` | Entry point |
-| `CaffeinateCat.swift` | App delegate: modes, timers, menu bar item, `pmset` + `sudoers` |
-| `PanelController.swift` | The popover — anchoring, sizing, dismissal |
-| `PanelView.swift` | Panel layout |
-| `Controls.swift` | Custom-drawn switch, segmented control, duration fields |
-| `Theme.swift` | Colours, fonts, and metrics |
 
 ---
 
