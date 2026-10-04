@@ -12,6 +12,10 @@ final class PanelController: NSObject, NSPopoverDelegate {
     /// Called for ⌘Q while the panel is open, so the shortcut drawn in the quit row is real.
     var onQuit: (() -> Void)?
 
+    /// Supplies fresh state as the panel opens. While it's closed, `apply` is skipped entirely, so
+    /// a running countdown costs nothing but the menu bar label.
+    var stateProvider: (() -> PanelState)?
+
     /// Width of the rect the popover centres itself on. Pinned to the status item's trailing edge,
     /// so it stays put no matter how wide the item's label grows.
     private static let anchorWidth: CGFloat = 22
@@ -53,6 +57,7 @@ final class PanelController: NSObject, NSPopoverDelegate {
     // MARK: - State
 
     func apply(_ state: PanelState) {
+        guard isVisible else { return }
         view.apply(state)
         resizeToFit()
     }
@@ -104,6 +109,7 @@ final class PanelController: NSObject, NSPopoverDelegate {
         guard !isVisible else { return }
 
         statusButton = button
+        if let state = stateProvider?() { view.apply(state) }
         view.refreshPalette()
         resizeToFit()
 
@@ -129,6 +135,7 @@ final class PanelController: NSObject, NSPopoverDelegate {
         lastHide = Date()
         stopMonitoring()
         statusButton?.highlight(false)
+        view.resetHover()
     }
 
     // MARK: - Key handling

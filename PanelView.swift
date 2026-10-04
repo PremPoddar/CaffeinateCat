@@ -1,6 +1,6 @@
 import Cocoa
 
-// The panel's contents, and the value type + delegate that connect it to the app.
+// The panel's contents, and the value types + delegate that connect it to the app.
 //
 // The views hold no app state: `AppDelegate` pushes a `PanelState` down, the views report intent
 // back up through `PanelViewDelegate`, and `AppDelegate` pushes a fresh state in response. Nothing
@@ -17,25 +17,58 @@ enum AwakeDuration: Equatable {
     case custom
 }
 
-struct PanelState {
-    var caffeinateOn = false
-    var lidOn = false
-    var caffeinateDuration: AwakeDuration = .indefinite
-    var lidDuration: AwakeDuration = .indefinite
-    var caffeinateCustomHours = 1
-    var caffeinateCustomMinutes = 0
-    var lidCustomHours = 1
-    var lidCustomMinutes = 0
+/// The toggles in the Options section, in display order.
+enum PanelOption: CaseIterable {
+    case allowDisplaySleep
+    case stopOnLowBattery
+    case activateOnLaunch
+    case launchAtLogin
+
+    var title: String {
+        switch self {
+        case .allowDisplaySleep: return "Allow display to sleep"
+        case .stopOnLowBattery:  return "Turn off at 20% and 10% battery"
+        case .activateOnLaunch:  return "Keep awake when app opens"
+        case .launchAtLogin:     return "Open at login"
+        }
+    }
+}
+
+struct FeatureState {
+    var title = ""
+    var subtitle = ""
+    var on = false
+    var duration: AwakeDuration = .indefinite
+    var customHours = DEFAULT_CUSTOM_HOURS
+    var customMinutes = DEFAULT_CUSTOM_MINUTES
     // Preformatted by AppDelegate, which owns the run's fixed-width CountdownFormat. Empty when the
     // feature is off or indefinite.
-    var caffeinateCountdown = ""
-    var lidCountdown = ""
+    var countdown = ""
+    var endsAt = ""
+    var progress: Double = 0
+}
+
+struct PanelState {
+    var caffeinate = FeatureState()
+    var lid = FeatureState()
+    var statusText = ""
+    var isAwake = false
+    var options: [PanelOption: Bool] = [:]
+    var optionsExpanded = false
+    var lidRuleInstalled = false
+    var availableUpdate: String?
+    var updatesSupported = true
 }
 
 protocol PanelViewDelegate: AnyObject {
     func panelDidToggle(_ feature: Feature, on: Bool)
     func panelDidSelectDuration(_ feature: Feature, _ duration: AwakeDuration)
     func panelDidEditCustom(_ feature: Feature, hours: Int, minutes: Int)
+    func panelDidSetOption(_ option: PanelOption, on: Bool)
+    func panelDidToggleOptionsExpanded()
+    func panelDidRequestRemoveLidRule()
+    func panelDidRequestUpdateCheck()
+    func panelDidRequestAbout()
     func panelDidRequestQuit()
 }
 
@@ -49,25 +82,26 @@ final class FeatureRowView: NSView {
     private static let durationTitles = ["Indefinite", "15m", "30m", "1h", "Custom"]
 
     private let feature: Feature
-    private let titleLabel: NSTextField
-    private let subtitleLabel: NSTextField
+    private let titleLabel = Labels.make("", font: Typography.rowTitle)
+    private let subtitleLabel = Labels.make("", font: Typography.rowSubtitle)
     private let toggle = ToggleSwitch()
     private let segmented = SegmentedControl(titles: FeatureRowView.durationTitles)
     private let customRow = DurationFieldRow()
     private let countdownLabel = Labels.make("", font: Typography.countdown)
+    private let endsAtLabel = Labels.make("", font: Typography.endsAt, alignment: .right)
+    private let progressBar = ProgressBar()
 
     private var isOn = false
     private var duration: AwakeDuration = .indefinite
 
     override var isFlipped: Bool { true }
 
-    init(feature: Feature, title: String, subtitle: String) {
+    init(feature: Feature) {
         self.feature = feature
-        titleLabel = Labels.make(title, font: Typography.rowTitle)
-        subtitleLabel = Labels.make(subtitle, font: Typography.rowSubtitle)
         super.init(frame: .zero)
 
-        for view in [titleLabel, subtitleLabel, toggle, segmented, customRow, countdownLabel] as [NSView] {
+        for view in [titleLabel, subtitleLabel, toggle, segmented, customRow,
+                     countdownLabel, endsAtLabel, progressBar] as [NSView] {
             addSubview(view)
         }
 
@@ -91,22 +125,34 @@ final class FeatureRowView: NSView {
     private var showsCustomFields: Bool { isOn && duration == .custom }
     private var showsCountdown: Bool { isOn && duration != .indefinite }
 
-    func apply(on: Bool, duration: AwakeDuration, customHours: Int, customMinutes: Int, countdown: String) {
-        isOn = on
-        self.duration = duration
+    func apply(_ state: FeatureState) {
+        // Only a change in which controls are showing needs a relayout; the per-second countdown
+        // update just swaps label text.
+        let structureChanged = state.on != isOn || state.duration != duration
 
-        toggle.set(on, animated: true)
-        if let index = Self.durations.firstIndex(of: duration) {
+        isOn = state.on
+        duration = state.duration
+
+        titleLabel.stringValue = state.title
+        subtitleLabel.stringValue = state.subtitle
+        toggle.accessibilityTitle = state.title
+        if toggle.isOn != state.on { toggle.set(state.on, animated: true) }
+        if let index = Self.durations.firstIndex(of: state.duration) {
             segmented.select(index)
         }
-        customRow.set(hours: customHours, minutes: customMinutes)
-        countdownLabel.stringValue = "Awake — \(countdown) left"
+        customRow.set(hours: state.customHours, minutes: state.customMinutes)
+        countdownLabel.stringValue = "Awake — \(state.countdown) left"
+        endsAtLabel.stringValue = state.endsAt.isEmpty ? "" : "until \(state.endsAt)"
+        progressBar.fraction = state.progress
 
+        // Visibility is applied every time (it's a no-op when unchanged) — gating it on a change
+        // left the controls showing at their zero frames for a row that starts, and stays, off.
         segmented.isHidden = !showsDurations
         customRow.isHidden = !showsCustomFields
         countdownLabel.isHidden = !showsCountdown
-
-        needsLayout = true
+        endsAtLabel.isHidden = !showsCountdown
+        progressBar.isHidden = !showsCountdown
+        if structureChanged { needsLayout = true }
     }
 
     /// Pure: used both to lay out this row and to size the panel.
@@ -119,6 +165,7 @@ final class FeatureRowView: NSView {
             }
             if showsCountdown {
                 height += Metrics.controlGap + Metrics.countdownHeight
+                    + Metrics.progressGap + Metrics.progressHeight
             }
         }
         return height
@@ -131,9 +178,11 @@ final class FeatureRowView: NSView {
         titleLabel.textColor = palette.text
         subtitleLabel.textColor = palette.subtext
         countdownLabel.textColor = palette.accent
+        endsAtLabel.textColor = palette.subtext
 
         let pad = Metrics.rowHorizontalPadding
-        let textWidth = bounds.width - pad * 2 - Metrics.switchWidth - Metrics.headerToggleGap
+        let contentWidth = bounds.width - pad * 2
+        let textWidth = contentWidth - Metrics.switchWidth - Metrics.headerToggleGap
         var y = Metrics.rowVerticalPadding
 
         titleLabel.frame = NSRect(x: pad, y: y, width: textWidth, height: Metrics.titleHeight)
@@ -150,22 +199,22 @@ final class FeatureRowView: NSView {
         guard showsDurations else { return }
 
         y += Metrics.sectionGap
-        segmented.frame = NSRect(x: pad, y: y, width: bounds.width - pad * 2, height: Metrics.segmentedHeight)
+        segmented.frame = NSRect(x: pad, y: y, width: contentWidth, height: Metrics.segmentedHeight)
         y += Metrics.segmentedHeight
 
         if showsCustomFields {
             y += Metrics.controlGap
-            customRow.frame = NSRect(x: pad, y: y,
-                                     width: bounds.width - pad * 2,
-                                     height: Metrics.customFieldHeight)
+            customRow.frame = NSRect(x: pad, y: y, width: contentWidth, height: Metrics.customFieldHeight)
             y += Metrics.customFieldHeight
         }
 
         if showsCountdown {
             y += Metrics.controlGap
-            countdownLabel.frame = NSRect(x: pad, y: y,
-                                          width: bounds.width - pad * 2,
-                                          height: Metrics.countdownHeight)
+            countdownLabel.frame = NSRect(x: pad, y: y, width: contentWidth * 0.62, height: Metrics.countdownHeight)
+            endsAtLabel.frame = NSRect(x: pad + contentWidth * 0.62, y: y,
+                                       width: contentWidth * 0.38, height: Metrics.countdownHeight)
+            y += Metrics.countdownHeight + Metrics.progressGap
+            progressBar.frame = NSRect(x: pad, y: y, width: contentWidth, height: Metrics.progressHeight)
         }
     }
 }
@@ -182,53 +231,124 @@ final class PanelView: NSView {
         }
     }
 
-    private let caffeinateRow = FeatureRowView(
-        feature: .caffeinate,
-        title: "Keep Screen Awake",
-        subtitle: "Prevents display sleep for active processes"
-    )
-    private let lidRow = FeatureRowView(
-        feature: .lid,
-        title: "Keep Awake on Lid Close",
-        subtitle: "Continues running with the lid closed"
-    )
-    private let topDivider = DividerView()
-    private let bottomDivider = DividerView()
-    private let quitRow = QuitRowView()
+    private let header = AppHeaderView()
+    private let caffeinateRow = FeatureRowView(feature: .caffeinate)
+    private let lidRow = FeatureRowView(feature: .lid)
+    private let optionsRow = MenuRowView(title: "Options")
+    private let optionRows: [PanelOption: OptionRowView]
+    private let removeRuleRow = MenuRowView(title: "Remove Lid-Close Permission…")
+    private let updatesRow = MenuRowView(title: "Check for Updates…")
+    private let aboutRow = MenuRowView(title: "About CaffeinateCat")
+    private let quitRow = MenuRowView(title: "Quit")
+    private let dividers = (0..<4).map { _ in DividerView() }
+
+    private var optionsExpanded = false
+    private var lidRuleInstalled = false
+    private var updatesSupported = true
 
     override var isFlipped: Bool { true }
 
     init() {
+        var rows: [PanelOption: OptionRowView] = [:]
+        for option in PanelOption.allCases { rows[option] = OptionRowView(title: option.title) }
+        optionRows = rows
+
         super.init(frame: NSRect(x: 0, y: 0, width: Metrics.panelWidth, height: 200))
-        for view in [caffeinateRow, topDivider, lidRow, bottomDivider, quitRow] as [NSView] {
-            addSubview(view)
+
+        let allRows: [NSView] = [header, caffeinateRow, lidRow, optionsRow, removeRuleRow, updatesRow, aboutRow, quitRow]
+            + PanelOption.allCases.compactMap { optionRows[$0] }
+        for view in allRows + dividers { addSubview(view) }
+
+        optionsRow.style = .subtle
+        optionsRow.trailing = .chevron(expanded: false)
+        optionsRow.onClick = { [weak self] in self?.delegate?.panelDidToggleOptionsExpanded() }
+
+        for (option, row) in optionRows {
+            row.isHidden = true
+            row.onToggle = { [weak self] on in self?.delegate?.panelDidSetOption(option, on: on) }
         }
-        quitRow.onQuit = { [weak self] in self?.delegate?.panelDidRequestQuit() }
+
+        removeRuleRow.isHidden = true
+        removeRuleRow.style = .subtle
+        removeRuleRow.isDestructive = true
+        removeRuleRow.onClick = { [weak self] in self?.delegate?.panelDidRequestRemoveLidRule() }
+
+        updatesRow.onClick = { [weak self] in self?.delegate?.panelDidRequestUpdateCheck() }
+        aboutRow.onClick = { [weak self] in self?.delegate?.panelDidRequestAbout() }
+
+        quitRow.trailing = .text("⌘Q")
+        quitRow.onClick = { [weak self] in self?.delegate?.panelDidRequestQuit() }
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func apply(_ state: PanelState) {
-        caffeinateRow.apply(on: state.caffeinateOn,
-                            duration: state.caffeinateDuration,
-                            customHours: state.caffeinateCustomHours,
-                            customMinutes: state.caffeinateCustomMinutes,
-                            countdown: state.caffeinateCountdown)
-        lidRow.apply(on: state.lidOn,
-                     duration: state.lidDuration,
-                     customHours: state.lidCustomHours,
-                     customMinutes: state.lidCustomMinutes,
-                     countdown: state.lidCountdown)
+        header.set(status: state.statusText, awake: state.isAwake)
+        caffeinateRow.apply(state.caffeinate)
+        lidRow.apply(state.lid)
+
+        for (option, row) in optionRows { row.set(state.options[option] ?? false) }
+
+        if state.optionsExpanded != optionsExpanded || state.lidRuleInstalled != lidRuleInstalled {
+            optionsExpanded = state.optionsExpanded
+            lidRuleInstalled = state.lidRuleInstalled
+            optionsRow.trailing = .chevron(expanded: optionsExpanded)
+            for row in optionRows.values { row.isHidden = !optionsExpanded }
+            removeRuleRow.isHidden = !(optionsExpanded && lidRuleInstalled)
+        }
+        updatesRow.title = state.availableUpdate.map { "Update to \($0)…" } ?? "Check for Updates…"
+        updatesRow.isHidden = !state.updatesSupported
+        updatesSupported = state.updatesSupported
         needsLayout = true
-        needsDisplay = true
+    }
+
+    /// Clears row hover state; called when the popover closes under the pointer.
+    func resetHover() {
+        [optionsRow, removeRuleRow, updatesRow, aboutRow, quitRow].forEach { $0.resetHover() }
+    }
+
+    /// One list drives both layout and sizing, so the two can't disagree.
+    private enum Item {
+        case view(NSView, CGFloat)
+        case divider(Int)
+    }
+
+    private var items: [Item] {
+        var items: [Item] = [
+            .view(header, Metrics.appHeaderHeight),
+            .divider(0),
+            .view(caffeinateRow, caffeinateRow.fittingHeight),
+            .divider(1),
+            .view(lidRow, lidRow.fittingHeight),
+            .divider(2),
+            .view(optionsRow, Metrics.menuRowHeight),
+        ]
+        if optionsExpanded {
+            items += PanelOption.allCases.compactMap { optionRows[$0] }.map { .view($0, Metrics.optionRowHeight) }
+            if lidRuleInstalled { items.append(.view(removeRuleRow, Metrics.menuRowHeight)) }
+        }
+        items += [
+            .divider(3),
+        ]
+        if updatesSupported { items.append(.view(updatesRow, Metrics.menuRowHeight)) }
+        items += [
+            .view(aboutRow, Metrics.menuRowHeight),
+            // The quit row runs to the panel's bottom edge, swallowing the closing padding so its
+            // hover highlight can reach the corners.
+            .view(quitRow, Metrics.menuRowHeight + Metrics.panelVerticalPadding),
+        ]
+        return items
+    }
+
+    private static func height(of item: Item) -> CGFloat {
+        switch item {
+        case .view(_, let height): return height
+        case .divider:             return Metrics.dividerHeight + Metrics.dividerMargin * 2
+        }
     }
 
     var fittingHeight: CGFloat {
-        Metrics.panelVerticalPadding * 2
-            + caffeinateRow.fittingHeight
-            + lidRow.fittingHeight
-            + (Metrics.dividerHeight + Metrics.dividerMargin * 2) * 2
-            + Metrics.quitRowHeight
+        Metrics.panelVerticalPadding + items.reduce(0) { $0 + Self.height(of: $1) }
     }
 
     override func layout() {
@@ -237,27 +357,19 @@ final class PanelView: NSView {
         var y = Metrics.panelVerticalPadding
         let width = bounds.width
 
-        func place(_ view: NSView, height: CGFloat) {
-            view.frame = NSRect(x: 0, y: y, width: width, height: height)
-            y += height
+        for item in items {
+            switch item {
+            case .view(let view, let height):
+                view.frame = NSRect(x: 0, y: y, width: width, height: height)
+                y += height
+            case .divider(let index):
+                y += Metrics.dividerMargin
+                dividers[index].frame = NSRect(x: 0, y: y, width: width, height: Metrics.dividerHeight)
+                y += Metrics.dividerHeight + Metrics.dividerMargin
+            }
         }
 
-        place(caffeinateRow, height: caffeinateRow.fittingHeight)
-
-        y += Metrics.dividerMargin
-        place(topDivider, height: Metrics.dividerHeight)
-        y += Metrics.dividerMargin
-
-        place(lidRow, height: lidRow.fittingHeight)
-
-        y += Metrics.dividerMargin
-        place(bottomDivider, height: Metrics.dividerHeight)
-        y += Metrics.dividerMargin
-
-        // The quit row runs to the panel's bottom edge, swallowing the closing padding so its hover
-        // highlight can reach the corners.
         quitRow.bottomCornerRadius = Metrics.panelCornerRadius
-        place(quitRow, height: Metrics.quitRowHeight + Metrics.panelVerticalPadding)
     }
 
     override func draw(_ dirtyRect: NSRect) {
