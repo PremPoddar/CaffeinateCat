@@ -241,6 +241,9 @@ footer .brand { font-size: 0.98rem; }
 footer a { color: var(--muted); text-decoration: none; transition: color .2s; }
 footer a:hover { color: var(--text); }
 .foot-note { color: var(--muted); font-size: 0.85rem; }
+.foot-links { display: flex; gap: 22px; }
+.micro a { color: inherit; text-decoration: underline; text-decoration-color: var(--card-border); text-underline-offset: 3px; }
+.micro a:hover { color: var(--text); }
 
 .fade-up { animation: fadeUp .9s ease both; }
 .fade-up.d1 { animation-delay: .1s; }
