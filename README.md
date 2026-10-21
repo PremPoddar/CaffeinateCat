@@ -8,6 +8,7 @@
 [![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white)](https://swift.org)
 [![Version](https://img.shields.io/badge/Version-1.3.0-E8A15A)](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)
 [![Updates](https://img.shields.io/badge/Updates-Sparkle-6E6E6E)](https://sparkle-project.org)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-prempoddar.github.io%2FCaffeinateCat-E8A15A)](https://prempoddar.github.io/CaffeinateCat/)
 
 **[Website](https://prempoddar.github.io/CaffeinateCat/)** · **[Download 1.3.0](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)** · **[Report a problem](https://github.com/PremPoddar/CaffeinateCat/issues)**
@@ -168,6 +169,12 @@ Use **Options → Remove Lid-Close Permission…** and untick **Open at login**,
 sudo rm /etc/sudoers.d/caffeinatecat
 rm -f ~/Library/LaunchAgents/com.caffeinatecat.launcher.plist
 ```
+
+---
+
+## 📄 License
+
+[Apache 2.0](LICENSE). Sparkle is used under the MIT License.
 
 ---
 
