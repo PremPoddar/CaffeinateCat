@@ -247,3 +247,19 @@ footer a:hover { color: var(--text); }
 .fade-up.d2 { animation-delay: .2s; }
 .fade-up.d3 { animation-delay: .3s; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(22px);} to { opacity:1; transform:none; } }
+
+/* Hero toy: keep the cat awake */
+.toy{max-width:560px;margin:44px auto 0;text-align:left;background:var(--card);border:1px solid var(--card-border);border-radius:24px;padding:18px 20px}
+.toy-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.toy-title{font-weight:700;font-size:1.02rem}
+.toy-tag{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.toy-stage{margin-top:6px}
+.toy-svg{width:100%;height:auto;display:block}
+#cup:hover{filter:brightness(1.1)}
+.toy-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.toy-btn{font:600 .9rem inherit;font-family:inherit;color:#241505;background:linear-gradient(135deg,var(--accent),var(--accent-2));border:0;border-radius:999px;padding:9px 16px;cursor:pointer}
+.toy-btn.ghost{color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--card-border)}
+.toy-btn:active{transform:scale(.96)}
+.toy-switch{display:flex;align-items:center;gap:9px;font-size:.86rem;color:var(--muted);cursor:pointer;margin-left:auto}
+.toy-note{font-size:.86rem;color:var(--muted);margin-top:10px;min-height:1.4em}
+@media(max-width:560px){.toy-switch{margin-left:0}}
