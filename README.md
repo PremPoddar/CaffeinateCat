@@ -1,9 +1,20 @@
-<p align="center">
-  <img src="assets/icon.png" alt="CaffeinateCat" width="128" height="128">
-</p>
+<div align="center">
 
+<img src=".github/assets/banner.png" alt="CaffeinateCat: keep your Mac awake, even with the lid closed" width="100%">
 
-<h1 align="center">CaffeinateCat</h1>
+<br><br>
+
+[![macOS 12+](https://img.shields.io/badge/macOS-12%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white)](https://swift.org)
+[![Version](https://img.shields.io/badge/Version-1.3.0-E8A15A)](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)
+[![Updates](https://img.shields.io/badge/Updates-Sparkle-6E6E6E)](https://sparkle-project.org)
+[![Website](https://img.shields.io/badge/Website-prempoddar.github.io%2FCaffeinateCat-E8A15A)](https://prempoddar.github.io/CaffeinateCat/)
+
+**[Website](https://prempoddar.github.io/CaffeinateCat/)** · **[Download 1.3.0](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)** · **[Report a problem](https://github.com/PremPoddar/CaffeinateCat/issues)**
+
+</div>
+
+---
 
 A tiny macOS menu-bar app that keeps your Mac awake — and, when you want it to, keeps it running **even with the lid closed and unplugged**.
 
@@ -11,7 +22,7 @@ Perfect for when you've got something that needs to keep going: a build, a local
 
 ---
 
-## What it does
+## ☕ What it does
 
 CaffeinateCat lives in your menu bar as a coffee cup ☕️ that doubles as a battery gauge: the drink inside sits at your battery's level (full, 80, 60, 40, 20, empty) — orange while it's keeping the Mac awake, grey when off — and the cup steams in lid-close mode. It gives you two levels of "stay awake":
 
@@ -24,7 +35,7 @@ CaffeinateCat lives in your menu bar as a coffee cup ☕️ that doubles as a ba
 
 On launch, **Keep Screen Awake turns on automatically (Indefinite)**, so the app just works the moment you open it.
 
-### The panel
+### 🪟 The panel
 
 Clicking the menu bar icon drops down a panel; **right-clicking** it turns keep-awake on or off in one go (using whichever mode you used last).
 
@@ -62,7 +73,7 @@ The two switches are mutually exclusive — turning one on turns the other off. 
 
 While a timer runs, the remaining time shows next to the menu bar icon as well as in the panel, with the clock time it ends at. Timers are measured on a clock that keeps running while the Mac sleeps, so a run that spans a sleep ends when it should. When it expires, the Mac goes back to sleeping normally.
 
-### Options
+### ⚙️ Options
 
 | Option | What it does |
 | --- | --- |
@@ -74,7 +85,18 @@ While a timer runs, the remaining time shows next to the menu bar icon as well a
 
 ---
 
-## How it works
+## 🧭 How it works
+
+```mermaid
+flowchart LR
+    U[You flip a switch] --> M{Which mode?}
+    M -- Keep Screen Awake --> A[ProcessInfo.beginActivity<br/>idle and display sleep held off]
+    M -- Keep Awake on Lid Close --> P[pmset -a disablesleep 1<br/>through a tightly scoped sudoers rule]
+    P --> W[Watchdog process<br/>restores sleep if the app dies]
+    A --> O[Turned off or quit]
+    P --> O
+    O --> R[Normal sleep restored and checked]
+```
 
 - **Keep Screen Awake** uses `ProcessInfo.beginActivity` with idle-system and idle-display sleep assertions. No special permissions needed.
 - **Keep Awake on Lid Close** sets the `SleepDisabled` flag in `IOPMrootDomain` via `pmset -a disablesleep 1`. This is the only reliable way to keep an Apple Silicon Mac awake with the lid shut on battery power.
@@ -99,7 +121,7 @@ After that, the feature works silently with no more prompts. The rule lives at `
 
 ---
 
-## Building from source
+## 🛠️ Building from source
 
 CaffeinateCat is a handful of Swift files. Its one dependency is [Sparkle](https://sparkle-project.org), used for automatic updates; `build.sh` downloads a pinned, checksum-verified release and embeds it. A plain `swiftc` build works without Sparkle and simply has no updater (the "Check for Updates…" row is hidden).
 
@@ -140,24 +162,24 @@ With a real `IDENTITY`, the script also writes `build/CaffeinateCat.xcarchive` a
 
 ---
 
-## Requirements
+## 💻 Requirements
 
 - macOS 12 (Monterey) or later
 - Administrator access (once) to enable the lid-closed feature
 
 ---
 
-## Updates
+## 🔄 Updates
 
 From version 1.3.0 CaffeinateCat updates itself with [Sparkle](https://sparkle-project.org). It checks `https://noxdrop.com/caffeinateCat/appcast.xml`, and every update is signed (EdDSA) and verified before it is installed. **Check for Updates…** in the panel runs a check on demand. An update restarts the app, which turns lid-closed mode off.
 
-## Sharing it
+## 🤝 Sharing it
 
 The app is designed to be shareable. When a friend or family member runs it for the first time, it sets up its own permission with a single native admin prompt. A notarized build (see `build.sh`) opens without warnings; an ad-hoc build may need right-click → **Open** the first time to get past Gatekeeper.
 
 ---
 
-## Uninstalling
+## 🧹 Uninstalling
 
 Use **Options → Remove Lid-Close Permission…** and untick **Open at login**, then delete the app. Or, by hand:
 
