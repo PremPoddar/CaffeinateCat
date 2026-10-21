@@ -39,33 +39,7 @@ On launch, **Keep Screen Awake turns on automatically (Indefinite)**, so the app
 
 Clicking the menu bar icon drops down a panel; **right-clicking** it turns keep-awake on or off in one go (using whichever mode you used last).
 
-```
-┌──────────────────────────────────────────┐
-│  ☕ CaffeinateCat                ● Awake  │
-├──────────────────────────────────────────┤
-│  Keep Screen Awake                 ●───  │
-│  Prevents display sleep…                 │
-│  ┌──────────┬─────┬─────┬────┬────────┐  │
-│  │Indefinite│ 15m │ 30m │ 1h │ Custom │  │
-│  └──────────┴─────┴─────┴────┴────────┘  │
-│  Awake — 27:14 left          until 14:32 │
-│  ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬───────────────── │
-├──────────────────────────────────────────┤
-│  Keep Awake on Lid Close           ───●  │
-│  Continues running with the lid closed   │
-├──────────────────────────────────────────┤
-│  Options                              ⌄  │
-│   ☐ Allow display to sleep               │
-│   ☑ Turn off at 20% and 10% battery      │
-│   ☑ Keep awake when app opens            │
-│   ☐ Open at login                        │
-│   Remove Lid-Close Permission…           │
-├──────────────────────────────────────────┤
-│  Check for Updates…                      │
-│  About CaffeinateCat                     │
-│  Quit                                ⌘Q  │
-└──────────────────────────────────────────┘
-```
+<p align="center"><img src=".github/assets/panel.png" alt="The CaffeinateCat panel in light and dark: Keep Screen Awake on for 30 minutes with 27:14 left, lid-close mode off, options open" width="100%"></p>
 
 Rows adapt to the state they describe: before the lid-close permission is installed, that switch reads *Runs lid-closed · asks for admin once*, and while the admin prompt is up, *Waiting for administrator approval…*. **Check for Updates…** names the new version instead once one is waiting, and is hidden entirely in a build without Sparkle. **Remove Lid-Close Permission…** shows only while the rule is installed.
 
@@ -145,6 +119,11 @@ IDENTITY="…" NOTARY_PROFILE=myprofile sh build.sh  # also notarizes, staples a
 
 With a real `IDENTITY`, the script also writes `build/CaffeinateCat.xcarchive` and copies it into Xcode's archive folder, so you can notarize by hand from **Window → Organizer → Distribute App → Direct Distribution**.
 
+<p align="center"><img src=".github/assets/modules.png" alt="CaffeinateCat source files and what each one does" width="100%"></p>
+
+<details>
+<summary><strong>As a table</strong></summary>
+
 | File | What's in it |
 | --- | --- |
 | `main.swift` | Entry point |
@@ -159,6 +138,8 @@ With a real `IDENTITY`, the script also writes `build/CaffeinateCat.xcarchive` a
 | `build.sh` | Builds, signs and optionally notarizes the `.app` without Xcode; embeds Sparkle |
 | `assets/icon.png` | The app icon, which `build.sh` turns into an `.icns` |
 | `tools/` | `fetch-sparkle.sh` (downloads the pinned Sparkle), `sparkle.conf` (its version, checksum and the update feed URL), `sparkle_public_key.txt` (the public key updates are verified with) |
+
+</details>
 
 ---
 
