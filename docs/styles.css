@@ -263,3 +263,4 @@ footer a:hover { color: var(--text); }
 .toy-switch{display:flex;align-items:center;gap:9px;font-size:.86rem;color:var(--muted);cursor:pointer;margin-left:auto}
 .toy-note{font-size:.86rem;color:var(--muted);margin-top:10px;min-height:1.4em}
 @media(max-width:560px){.toy-switch{margin-left:0}}
+.by-strip{position:relative;z-index:60;display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;padding:7px 16px;font-size:.8rem;color:var(--muted);border-bottom:1px solid var(--card-border)}.by-strip a{color:var(--text);text-decoration:none;font-weight:600}.by-strip a:hover{text-decoration:underline}
