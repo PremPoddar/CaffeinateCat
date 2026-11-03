@@ -54,11 +54,12 @@ footer a{text-decoration:none;margin:0 10px}footer a:hover{color:var(--text)}
 .z{font-family:var(--display);font-weight:700;fill:var(--accent);animation:zz 3s ease-in-out infinite;opacity:0}.z1{font-size:16px}.z2{font-size:20px;animation-delay:.6s}.z3{font-size:26px;animation-delay:1.2s}
 @keyframes zz{0%{opacity:0;transform:translateY(8px)}30%,70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.brand-line{display:flex;align-items:center;gap:10px;min-width:0}.by-sep{color:var(--muted);opacity:.55}.by{color:var(--muted);text-decoration:none;font-weight:500;font-size:.95rem;white-space:nowrap;transition:color .2s}.by:hover{color:var(--text)}@media(max-width:520px){.brand-line{flex-direction:column;align-items:flex-start;gap:0}.by-sep{display:none}.by{font-size:.74rem;line-height:1.1;margin-left:42px;margin-top:-3px}}
 </style>
 </head>
 <body>
 <div class="bg"></div><div class="grid"></div>
-<nav><a class="brand" href="./"><img src="assets/icon.png" alt="" />CaffeinateCat</a></nav>
+<nav><div class="brand-line"><a class="brand" href="./"><img src="assets/icon.png" alt="" />CaffeinateCat</a><span class="by-sep">—</span><a class="by" href="https://prempoddar.is-a.dev">Prem Poddar</a></div></nav>
 <main>
   <div class="stage fade"><div class="big">404</div>
 <svg class="art" viewBox="0 0 320 180" aria-hidden="true">
