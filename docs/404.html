@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Shown for any missing address, so links are resolved from the site's root. -->
+<base href="/CaffeinateCat/" />
+<title>Page not found · CaffeinateCat</title>
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#0F0B08" />
+<link rel="icon" href="assets/icon.png" />
+<style>
+:root{--bg:#0F0B08;--bg-2:#17100B;--text:#F4ECE3;--muted:#A99E91;--accent:#E8A15A;--accent-2:#C9743A;--accent-3:#F4C68C;--on-accent:#1E1006;
+--accent-glow:rgba(232,161,90,0.38);--accent-soft:rgba(232,161,90,0.14);--accent-line:rgba(232,161,90,0.3);--line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.22);--card:rgba(255,255,255,.04);--card-solid:#17100B;
+--display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;--body:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.6;font-size:17px;-webkit-font-smoothing:antialiased;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh}
+a{color:inherit}
+.bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(60% 50% at 50% 0%,rgba(232,161,90,0.17),transparent 70%),radial-gradient(40% 40% at 88% 70%,rgba(232,161,90,0.09),transparent 70%),linear-gradient(180deg,var(--bg),var(--bg-2))}
+.grid{position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:54px 54px;
+mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,#000 40%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 30%,#000 40%,transparent 100%)}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1100px;width:100%;margin:0 auto;padding:18px 24px}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:700;font-size:1.08rem;text-decoration:none}
+.brand img{width:30px;height:30px;border-radius:8px}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 24px 56px}
+.stage{position:relative;isolation:isolate;width:min(340px,86vw)}
+.big{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);font-family:var(--display);font-weight:700;font-size:clamp(7rem,30vw,13rem);line-height:1;letter-spacing:-.05em;
+background:linear-gradient(180deg,rgba(232,161,90,0.3),transparent 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;z-index:-1;user-select:none}
+.art{width:100%;height:auto;display:block;overflow:visible;filter:drop-shadow(0 24px 40px rgba(232,161,90,0.38))}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-top:34px}
+h1{font-family:var(--display);font-size:clamp(2rem,5.4vw,3.3rem);font-weight:700;letter-spacing:-.03em;line-height:1.08;margin-top:14px;max-width:760px}
+.hl{background:linear-gradient(120deg,var(--accent),var(--accent-3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+p.lead{color:var(--muted);max-width:540px;margin:18px auto 0;font-size:clamp(1rem,2.2vw,1.12rem)}
+.path{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:.8rem;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.path b{color:var(--text);font-weight:500}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;border-radius:999px;font-size:1rem;padding:14px 26px;transition:transform .22s,box-shadow .22s,border-color .2s,background .2s}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);font-weight:680;box-shadow:0 12px 34px -8px var(--accent-glow)}
+.btn.primary:hover{transform:translateY(-3px);box-shadow:0 20px 44px -8px var(--accent-glow)}
+.btn.ghost{border:1px solid var(--line);background:var(--card);font-weight:550}
+.btn.ghost:hover{border-color:var(--line-strong)}
+.btn svg{width:18px;height:18px}
+footer{text-align:center;padding:0 24px 28px;font-size:.88rem;color:var(--muted)}
+footer a{text-decoration:none;margin:0 10px}footer a:hover{color:var(--text)}
+.fade{animation:fadeUp .8s ease both}.f1{animation-delay:.08s}.f2{animation-delay:.16s}.f3{animation-delay:.24s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.steam path{fill:none;stroke:rgba(255,255,255,.18);stroke-width:4;stroke-linecap:round;animation:rise 3s ease-in infinite}
+.steam path:nth-child(2){animation-delay:1s}.steam path:nth-child(3){animation-delay:2s}
+@keyframes rise{0%{opacity:0;transform:translateY(12px)}40%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+.z{font-family:var(--display);font-weight:700;fill:var(--accent);animation:zz 3s ease-in-out infinite;opacity:0}.z1{font-size:16px}.z2{font-size:20px;animation-delay:.6s}.z3{font-size:26px;animation-delay:1.2s}
+@keyframes zz{0%{opacity:0;transform:translateY(8px)}30%,70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+<nav><a class="brand" href="./"><img src="assets/icon.png" alt="" />CaffeinateCat</a></nav>
+<main>
+  <div class="stage fade"><div class="big">404</div>
+<svg class="art" viewBox="0 0 320 180" aria-hidden="true">
+  <g class="steam"><path d="M140 40c-8 10 8 16 0 28"/><path d="M160 32c-8 10 8 16 0 28"/><path d="M180 40c-8 10 8 16 0 28"/></g>
+  <path d="M112 78h96v46a34 34 0 0 1-34 34h-28a34 34 0 0 1-34-34Z" fill="var(--accent)"/>
+  <path d="M208 90h10a18 18 0 0 1 0 36h-12" fill="none" stroke="var(--accent)" stroke-width="10"/>
+  <path d="M138 104q8 6 16 0M166 104q8 6 16 0" fill="none" stroke="var(--bg)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M154 118q6 5 12 0" fill="none" stroke="var(--bg)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M124 78l8-16 10 16M178 78l10-16 8 16" fill="var(--accent)"/>
+  <text class="z z1" x="222" y="62">z</text><text class="z z2" x="238" y="46">z</text><text class="z z3" x="256" y="30">Z</text>
+</svg></div>
+  <p class="eyebrow fade f1">Error 404 · dozed off</p>
+  <h1 class="fade f1">This page <span class="hl">fell asleep.</span></h1>
+  <p class="lead fade f2">CaffeinateCat keeps your Mac awake, but there's no page at this address to keep awake. It may have moved, or there's a typo in the link.</p>
+  <span class="path fade f2" id="path" hidden>Looked for <b></b></span>
+  <div class="cta fade f3">
+    <a class="btn primary" href="./"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to CaffeinateCat</a>
+    <a class="btn ghost" href="https://github.com/PremPoddar/CaffeinateCat/issues">Report a broken link</a>
+  </div>
+</main>
+<footer><a href="https://github.com/PremPoddar/CaffeinateCat">Source</a><a href="https://github.com/PremPoddar">More apps</a></footer>
+<script>
+  // Show which address was missing, without the site's own folder at the front.
+  var p = decodeURIComponent(location.pathname).replace(/^\/CaffeinateCat\/?/i, "/");
+  if (p.length > 1) { var e = document.getElementById("path"); e.querySelector("b").textContent = p; e.hidden = false; }
+</script>
+</body>
+</html>
