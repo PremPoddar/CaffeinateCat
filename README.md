@@ -9,9 +9,9 @@
 [![Version](https://img.shields.io/badge/Version-1.3.0-E8A15A)](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)
 [![Updates](https://img.shields.io/badge/Updates-Sparkle-6E6E6E)](https://sparkle-project.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
-[![Website](https://img.shields.io/badge/Website-prempoddar.github.io%2FCaffeinateCat-E8A15A)](https://prempoddar.github.io/CaffeinateCat/)
+[![Website](https://img.shields.io/badge/Website-prempoddar.is-a.dev%2FCaffeinateCat-E8A15A)](https://prempoddar.is-a.dev/CaffeinateCat/)
 
-**[Website](https://prempoddar.github.io/CaffeinateCat/)** · **[Download 1.3.0](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)** · **[Report a problem](https://github.com/PremPoddar/CaffeinateCat/issues)**
+**[Website](https://prempoddar.is-a.dev/CaffeinateCat/)** · **[Download 1.3.0](https://noxdrop.com/caffeinateCat/releases/CaffeinateCat-1.3.0.zip)** · **[Report a problem](https://github.com/PremPoddar/CaffeinateCat/issues)**
 
 </div>
 
