@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy policy · CaffeinateCat</title>
+  <meta name="description" content="What CaffeinateCat does with your data: no account, no analytics, no ads. Your settings and battery level stay on your Mac." />
+  <link rel="canonical" href="https://prempoddar.is-a.dev/CaffeinateCat/privacy.html" />
+  <meta name="theme-color" content="#0f0b08" />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Policy page only. The shared stylesheet supplies the background, nav and footer. */
+    .policy { padding: 72px 0 84px; }
+    .policy .wrap { max-width: 760px; }
+    .policy .eyebrow { text-align: left; }
+    .policy h1 { font-size: clamp(2.1rem, 5vw, 3.3rem); line-height: 1.08; margin-top: 12px; }
+    .policy .lead { color: var(--muted); font-size: 1.05rem; margin-top: 18px; max-width: 640px; }
+    .policy .updated { color: var(--muted); font-size: 0.82rem; font-family: ui-monospace, "SF Mono", Menlo, monospace; margin-top: 18px; }
+    .policy-summary { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 22px 24px; margin-top: 36px; }
+    .policy-summary p { margin: 0; color: var(--text); }
+    .policy-summary strong { color: var(--accent); }
+    .policy section { padding: 0; margin-top: 38px; padding-top: 30px; border-top: 1px solid var(--card-border); }
+    .policy h2 { display: flex; gap: 14px; align-items: baseline; font-size: 1.28rem; font-weight: 680; letter-spacing: -0.015em; }
+    .policy h2 span { color: var(--accent); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.82rem; font-weight: 600; }
+    .policy section p, .policy section li { color: #d8ccbf; font-size: 0.98rem; margin-top: 12px; }
+    .policy section ul { margin: 12px 0 0 20px; display: grid; gap: 7px; }
+    .policy section li { margin-top: 0; }
+    .policy a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(232, 161, 90, 0.35); }
+    .policy a:hover { border-bottom-color: var(--accent); }
+    .policy code { background: rgba(255, 255, 255, 0.07); padding: 2px 6px; border-radius: 6px; font-size: 0.86em; color: var(--accent); word-break: break-word; }
+    .policy .back { display: inline-flex; align-items: center; gap: 8px; margin-top: 42px; color: var(--muted); font-size: 0.92rem; text-decoration: none; border: 0; }
+    .policy .back:hover { color: var(--text); }
+    @media (max-width: 560px) { .policy { padding-top: 48px; } .policy h2 { gap: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <nav>
+    <div class="wrap">
+      <div class="brand-line"><div class="brand"><img src="assets/icon.png" alt="" /> CaffeinateCat</div><span class="by-sep">—</span><a class="by" href="https://prempoddar.is-a.dev">Prem Poddar</a></div>
+      <div class="nav-links">
+        <a href="./#features">Features</a>
+        <a href="./#how">How it works</a>
+        <a href="privacy.html" aria-current="page">Privacy</a>
+        <a href="./#download" class="nav-cta">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="policy">
+    <div class="wrap">
+      <p class="eyebrow">CaffeinateCat · Privacy</p>
+      <h1>Keep your Mac awake.<br />Keep your data at home.</h1>
+      <p class="lead">CaffeinateCat is a small menu-bar app. This page explains what it does with your information, in the same plain language as the rest of the site.</p>
+      <p class="updated">Last updated 28 November 2026</p>
+
+      <div class="policy-summary">
+        <p><strong>The short version.</strong> There is no account, no analytics, no advertising and no crash reporting. Your settings and battery level never leave your Mac. The only network request is an update check.</p>
+      </div>
+
+      <!-- To change this policy, edit the text below and update the date in .updated. -->
+      <section>
+        <h2><span>01</span> What the app collects</h2>
+        <p>Nothing. CaffeinateCat has no sign-up and no user account. It does not send us your settings, your battery level, your Mac's name, or a record of when you use it. There is no server that receives any of that.</p>
+      </section>
+
+      <section>
+        <h2><span>02</span> What stays on your Mac</h2>
+        <p>The app saves a few things locally so it can work the way you expect. None of it is uploaded:</p>
+        <ul>
+          <li>Your preferences, such as the timer you picked, the options you turned on, and the mode you used last. These live in the app's standard macOS preferences.</li>
+          <li>A small marker while lid-close mode is on, so the app can put normal sleep back if it is interrupted. The marker is removed when the mode is off.</li>
+          <li>If you turn on <strong>Open at login</strong>, a LaunchAgent file in <code>~/Library/LaunchAgents</code>.</li>
+        </ul>
+        <p>Deleting the app and these files removes all of it. We cannot read any of it.</p>
+      </section>
+
+      <section>
+        <h2><span>03</span> Battery level</h2>
+        <p>CaffeinateCat reads your battery level from macOS to draw the cup in the menu bar and to switch keep-awake off at 20% and 10%. The level is used on your Mac at that moment. It is not stored and not sent anywhere.</p>
+      </section>
+
+      <section>
+        <h2><span>04</span> Administrator permission</h2>
+        <p>Lid-close mode changes a setting that only an administrator can change. The first time you turn it on, macOS shows its own password prompt, and Touch ID works too. Your password goes to macOS, not to CaffeinateCat. The app never sees or stores it.</p>
+        <p>The app then installs a small rule at <code>/etc/sudoers.d/caffeinatecat</code> that allows exactly two commands: <code>pmset -a disablesleep 1</code> and <code>pmset -a disablesleep 0</code>. You can remove the rule at any time with <strong>Options</strong>, then <strong>Remove Lid-Close Permission</strong>.</p>
+      </section>
+
+      <section>
+        <h2><span>05</span> Network access and updates</h2>
+        <p>Versions before 1.3.0 make no network connections. From 1.3.0, CaffeinateCat uses Sparkle to check for updates. It asks <code>noxdrop.com</code> for a small file that lists the latest version, and if there is a newer one it downloads it from the same place. Every update is signed and checked on your Mac before it is installed.</p>
+        <p>That request does not include your name, your settings, your battery level or anything you do with the app. As with any download, the server sees the internet address the request comes from and the name and version of the app. We do not use that information to identify you. You can run a check yourself with <strong>Check for Updates</strong> in the panel.</p>
+      </section>
+
+      <section>
+        <h2><span>06</span> This website</h2>
+        <p>This site is a set of static files hosted on GitHub Pages. It has no cookies, no analytics, no advertising and no forms. GitHub may keep standard access logs, such as the address a request came from and the page requested, under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. The page loads no third-party fonts or scripts.</p>
+      </section>
+
+      <section>
+        <h2><span>07</span> Third parties</h2>
+        <p>There are no advertising networks, analytics services or tracking tools in the app or on this site. Your use of CaffeinateCat is not profiled, shared or sold. Because we never receive your data, there is nothing for us to delete on request.</p>
+      </section>
+
+      <section>
+        <h2><span>08</span> Children</h2>
+        <p>CaffeinateCat is not directed at children, and it collects nothing from anyone. If you are a parent or guardian and have a question, please get in touch.</p>
+      </section>
+
+      <section>
+        <h2><span>09</span> Changes to this policy</h2>
+        <p>If this policy changes, the new version will be posted on this page with a new date at the top. Changes take effect when they are posted.</p>
+      </section>
+
+      <section>
+        <h2><span>10</span> Contact</h2>
+        <p>CaffeinateCat is made by Prem Poddar. Questions about this policy are welcome at <a href="mailto:prempoddar@yandex.com">prempoddar@yandex.com</a>, or open an issue on <a href="https://github.com/PremPoddar/CaffeinateCat/issues">GitHub</a>.</p>
+      </section>
+
+      <a class="back" href="./">&larr; Back to CaffeinateCat</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="brand"><img src="assets/icon.png" alt="" style="width:26px;height:26px;border-radius:7px;" /> CaffeinateCat</div>
+      <div class="foot-note">Made with ☕ for people who close their laptops mid-task.</div>
+      <span style="display:flex;gap:20px;flex-wrap:wrap"><a href="privacy.html" aria-current="page">Privacy</a><a href="https://github.com/PremPoddar/CaffeinateCat">GitHub →</a><a href="https://prempoddar.is-a.dev">Website →</a><a href="mailto:prempoddar@yandex.com">Contact me →</a></span>
+    </div>
+  </footer>
+</body>
+</html>
