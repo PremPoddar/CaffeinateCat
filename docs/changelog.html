@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Release notes · CaffeinateCat</title>
+  <meta name="description" content="Every CaffeinateCat release, newest first." />
+  <link rel="canonical" href="https://prempoddar.is-a.dev/CaffeinateCat/changelog.html" />
+  <meta name="theme-color" content="#0f0b08" />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .changelog { padding: 72px 0 84px; }
+    .changelog .wrap { max-width: 760px; }
+    .changelog .eyebrow { text-align: left; }
+    .changelog h1 { font-size: clamp(2.1rem, 5vw, 3.3rem); line-height: 1.08; margin-top: 12px; }
+    .changelog .lead { color: var(--muted); font-size: 1.05rem; margin-top: 18px; max-width: 640px; }
+    .changelog .more { margin-top: 20px; color: var(--muted); font-size: 0.9rem; }
+    .release { margin-top: 38px; padding-top: 30px; border-top: 1px solid var(--card-border); }
+    .release:first-child { margin-top: 48px; }
+    .release-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+    .release-head h2 { font-size: 1.6rem; font-weight: 680; letter-spacing: -0.015em; margin: 0; }
+    .badge { align-self: center; background: var(--accent); color: #241505; font: 700 10px ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
+    .release .date { color: var(--muted); font: 500 13px ui-monospace, "SF Mono", Menlo, monospace; }
+    .release ul { margin: 14px 0 0 20px; display: grid; gap: 7px; }
+    .release li { color: #d8ccbf; font-size: 0.98rem; }
+    .release h2,.release h3 { color: var(--text); }
+    .release code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 6px; font-size: 0.86em; color: var(--accent); word-break: break-word; }
+    .release p { color: #d8ccbf; font-size: 0.98rem; margin-top: 12px; }
+    .release table { width: 100%; border-collapse: collapse; margin-top: 12px; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); overflow: hidden; }
+    .release th, .release td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 0.95rem; }
+    .release thead th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .release tbody tr:last-child td { border-bottom: none; }
+    .back { display: inline-flex; align-items: center; gap: 8px; margin-top: 42px; color: var(--muted); font-size: 0.92rem; text-decoration: none; border: 0; }
+    .back:hover { color: var(--text); }
+    @media (max-width: 560px) { .changelog { padding-top: 48px; } }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <nav>
+    <div class="wrap">
+      <div class="brand-line"><div class="brand"><img src="assets/icon.png" alt="" /> CaffeinateCat</div><span class="by-sep">—</span><a class="by" href="https://prempoddar.is-a.dev">Prem Poddar</a></div>
+      <div class="nav-links">
+        <a href="./#features">Features</a>
+        <a href="./#how">How it works</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="changelog.html" aria-current="page">Release notes</a>
+        <a href="./#download" class="nav-cta">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="changelog">
+    <div class="wrap">
+      <p class="eyebrow">CaffeinateCat · Release notes</p>
+      <h1>Keep your Mac awake.</h1>
+      <p class="lead">Every CaffeinateCat release, newest first. The same notes are on the <a href="https://github.com/PremPoddar/CaffeinateCat/releases" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,161,90,0.35)">GitHub releases page</a>.</p>
+      <p class="more">Older builds and their attached notes are in the <a href="https://github.com/PremPoddar/CaffeinateCat/releases" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,161,90,0.35)">GitHub releases</a>.</p>
+      
+      <section class="release" id="v1-1-0">
+        <div class="release-head">
+          <h2 id="v1-1-0-title">1.1.0</h2>
+          <span class="badge">Latest</span>
+          <span class="date">9 August 2026</span>
+        </div>
+        <h2 id="whats-new">What's new</h2>
+<p>CaffeinateCat's menu bar interface has been rebuilt. The old menu
+with its two rows and nested duration submenus is gone. Clicking the
+coffee cup now drops down a proper panel.</p>
+<p><img
+src="https://github.com/PremPoddar/CaffeinateCat/raw/main/docs/assets/icon.png"
+alt="The panel: a switch per mode, a duration control, and a live countdown" /></p>
+<h3 id="a-real-panel-instead-of-a-menu">A real panel instead of a
+menu</h3>
+<ul>
+<li><strong>A switch for each mode</strong>, with a one-line description
+of what it does. Flipping one on turns the other off, same as
+before.</li>
+<li><strong>Durations are right there</strong> — Indefinite, 15m, 30m,
+1h, or Custom — instead of hidden behind a submenu arrow.</li>
+<li><strong>Custom durations</strong> now use hours and minutes fields
+with stepper arrows. Typing or clicking an arrow updates the running
+timer straight away. The old "how many minutes?" dialog is gone.</li>
+<li><strong>A live countdown</strong> in the panel <em>and</em> next to
+the menu bar icon, so you can see how long is left without opening
+anything.</li>
+</ul>
+<h3 id="renamed-modes">Renamed modes</h3>
+<table>
+<thead>
+<tr>
+<th>Before</th>
+<th>Now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Caffeinate</td>
+<td><strong>Keep Screen Awake</strong></td>
+</tr>
+<tr>
+<td>Keep Awake When Lid Closed</td>
+<td><strong>Keep Awake on Lid Close</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="timer-changes">Timer changes</h3>
+<ul>
+<li>The <strong>2h</strong> preset was dropped. Set 2h 0m under
+<strong>Custom</strong> to get it back — and that's now the default the
+custom fields start at.</li>
+<li>Emptying a custom timer to <code>0h 0m</code> switches the mode off
+and restores the 2h default.</li>
+</ul>
+<h3 id="unchanged">Unchanged</h3>
+<p>Everything that actually keeps your Mac awake works exactly as it
+did: the same idle assertions, the same tightly-scoped
+<code>pmset</code> permission rule, and the same guarantee that normal
+sleep is restored when you switch off or quit. <strong>If you already
+granted the lid-close permission, you won't be asked again.</strong></p>
+
+      </section>
+
+      <section class="release" id="v1-0-0">
+        <div class="release-head">
+          <h2 id="v1-0-0-title">1.0.0</h2>
+          
+          <span class="date">7 July 2026</span>
+        </div>
+        <p>A tiny macOS menu-bar app that keeps your Mac awake — even with the
+lid closed and unplugged. ☕️</p>
+<h3 id="features">Features</h3>
+<ul>
+<li><strong>Caffeinate</strong> — keeps the screen on and prevents idle
+sleep.</li>
+<li><strong>Keep Awake When Lid Closed</strong> — keeps your Mac running
+with the lid shut, even on battery. Perfect for builds, servers,
+downloads, or coding agents while you travel.</li>
+<li><strong>Timers</strong> — run either mode indefinitely or auto-off
+after 15m / 30m / 1h / 2h / a custom duration.</li>
+<li>Starts caffeinating automatically on launch, so it just works.</li>
+<li>One-time admin setup for the lid-closed feature — no developer
+account or manual config needed.</li>
+</ul>
+
+      </section>
+
+      <a class="back" href="./">&larr; Back to CaffeinateCat</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="brand"><img src="assets/icon.png" alt="" style="width:26px;height:26px;border-radius:7px;" /> CaffeinateCat</div>
+      <div class="foot-note">Made with ☕ for people who close their laptops mid-task.</div>
+      <span style="display:flex;gap:20px;flex-wrap:wrap"><a href="changelog.html" aria-current="page">Release notes</a><a href="privacy.html">Privacy</a><a href="https://github.com/PremPoddar/CaffeinateCat">GitHub →</a><a href="https://prempoddar.is-a.dev">Website →</a><a href="mailto:prempoddar@yandex.com">Contact me →</a></span>
+    </div>
+  </footer>
+</body>
+</html>
